@@ -1,7 +1,6 @@
 "use client";
 import { Paper, TextField } from "@mui/material";
 import { useState } from "react";
-import Link from "next/link";
 import { EmployeeListContainer } from "./EmployeeListContainer";
 import { AddNewTalentModal } from "./AddNewTalentModal";
 
@@ -43,8 +42,7 @@ export function SearchEmployees() {
       <AddNewTalentModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-      >
-      </AddNewTalentModal>
+      />
       <EmployeeListContainer
         key="employeesContainer"
         filterText={searchKeyword}

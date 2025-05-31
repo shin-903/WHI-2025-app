@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Modal, Box, TextField } from "@mui/material";
+import "./addNewTalentModal.css";
 
 interface AddNewTalentModalProps {
   isOpen: boolean;
@@ -12,9 +13,12 @@ export function AddNewTalentModal({ isOpen, onClose, children }: AddNewTalentMod
   const [age, setAge] = useState("");
 
   const submitForm = () => {
+    
     console.log(`登録: 名前=${name}, 年齢=${age}`);
     setName("");
     setAge("");
+
+    
     onClose();
   }
   return (
