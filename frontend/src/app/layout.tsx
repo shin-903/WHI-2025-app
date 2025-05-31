@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "タレントマネジメントシステム",
-  description: "シンプルなタレントマネジメントシステム",
+  title: "EzMatcher",
+  description: "EzMatcher",
 };
 
 export default function RootLayout({
