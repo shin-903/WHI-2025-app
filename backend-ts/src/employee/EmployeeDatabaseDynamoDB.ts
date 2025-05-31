@@ -46,7 +46,6 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
   }
 
   async getEmployees(filterText: string): Promise<Employee[]> {
-    // 【修正箇所】渡された検索文字列を小文字に変換し、大小文字を区別せずに検索できるようにする
     const lowerFilter = filterText.trim().toLowerCase();
 
     const input: ScanCommandInput = {

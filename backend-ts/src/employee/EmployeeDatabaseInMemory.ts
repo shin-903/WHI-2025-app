@@ -20,7 +20,6 @@ export class EmployeeDatabaseInMemory implements EmployeeDatabase {
     if (filterText === "") {
       return employees;
     }
-    // 【修正箇所】渡された検索文字列を小文字に変換し、大小文字を区別せずに検索できるようにする
     const lowerFilter = filterText.toLowerCase();
     return employees.filter((employee) =>
       employee.name.toLowerCase().includes(lowerFilter)
