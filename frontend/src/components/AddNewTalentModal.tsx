@@ -5,7 +5,7 @@ import "./addNewTalentModal.css";
 interface AddNewTalentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export function AddNewTalentModal({ isOpen, onClose, children }: AddNewTalentModalProps) {
@@ -13,7 +13,7 @@ export function AddNewTalentModal({ isOpen, onClose, children }: AddNewTalentMod
   const [age, setAge] = useState("");
 
   const submitForm = () => {
-    
+
     console.log(`登録: 名前=${name}, 年齢=${age}`);
     setName("");
     setAge("");
