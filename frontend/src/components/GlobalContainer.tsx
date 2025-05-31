@@ -9,7 +9,7 @@ export function GlobalContainer({ children }: { children?: React.ReactNode }) {
       sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
       <header>
-        <GlobalHeader title={"タレントマネジメントシステム"} />
+        <GlobalHeader title={"EzMatcher"} />
       </header>
 
       <VerticalSpacer height={32} />
