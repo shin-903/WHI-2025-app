@@ -3,13 +3,10 @@ name: PreMerge Test
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - "**"
 
 jobs:
-  pre-merge-build:
+  pre-merge-test:
     runs-on: ubuntu-latest
 
     steps:
