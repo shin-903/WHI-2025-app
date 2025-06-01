@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@aws-sdk/lib-dynamodb": "^3.821.0",
-    "io-ts": "^2.2.22"
+    "io-ts": "^2.2.22",
+    "uuid": "^11.1.0"
   }
 }

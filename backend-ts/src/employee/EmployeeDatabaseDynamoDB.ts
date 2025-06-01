@@ -1,7 +1,8 @@
-import { DynamoDBClient, GetItemCommand, GetItemCommandInput, ScanCommand, ScanCommandInput } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, GetItemCommand, GetItemCommandInput, PutItemCommand, PutItemCommandInput, ScanCommand, ScanCommandInput } from "@aws-sdk/client-dynamodb";
 import { isLeft } from "fp-ts/Either";
 import { EmployeeDatabase } from "./EmployeeDatabase";
-import { Employee, EmployeeT } from "./Employee";
+import { Employee, EmployeeT, NewEmployee } from "./Employee";
+import { UUID, randomUUID } from "crypto";
 
 export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
     private client: DynamoDBClient;
@@ -63,6 +64,21 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
                     return [decoded.right];
                 }
             });
+    }
+
+    async addEmployee(employee: NewEmployee): Promise<void> {
+        const newId = randomUUID();
+
+        const input: PutItemCommandInput = {
+            TableName: this.tableName,
+            Item: {
+                //一番大きいidをとってくる
+                id: { S: newId.toString() },
+                name: { S: employee.name },
+                age: { N: employee.age.toString() },
+            },
+        };
+        await this.client.send(new PutItemCommand(input));
     }
 }
 

@@ -12,7 +12,15 @@ export function AddNewTalentModal({ isOpen, onClose, children }: AddNewTalentMod
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
 
-  const submitForm = () => {
+  const submitForm = async () => {
+    const employee = {name, age: parseInt(age, 10)};
+    await fetch(`/api/employees`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(employee),
+    });
 
     console.log(`登録: 名前=${name}, 年齢=${age}`);
     setName("");
