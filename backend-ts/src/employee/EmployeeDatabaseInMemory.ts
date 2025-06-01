@@ -1,4 +1,4 @@
-import { EmployeeDatabase } from "./EmployeeDatabase";
+import { EmployeeDatabase, EmployeeFilters } from "./EmployeeDatabase";
 import { Employee } from "./Employee";
 
 export class EmployeeDatabaseInMemory implements EmployeeDatabase {
@@ -6,23 +6,60 @@ export class EmployeeDatabaseInMemory implements EmployeeDatabase {
 
   constructor() {
     this.employees = new Map<string, Employee>();
-    this.employees.set("1", { id: "1", name: "Jane Doe", age: 22 });
-    this.employees.set("2", { id: "2", name: "John Smith", age: 28 });
-    this.employees.set("3", { id: "3", name: "山田 太郎", age: 27 });
+    this.employees.set("1", {
+      id: "1",
+      name: "Jane Doe",
+      age: 22,
+      position: "Software Engineer",
+      skills: "JavaScript, TypeScript",
+    });
+    this.employees.set("2", {
+      id: "2",
+      name: "John Smith",
+      age: 28,
+      position: "Data Scientist",
+      skills: "Python, Ruby",
+    });
+    this.employees.set("3", {
+      id: "3",
+      name: "山田 太郎",
+      age: 27,
+      position: "Web Developer",
+      skills: "HTML, CSS, JavaScript",
+    });
   }
 
   async getEmployee(id: string): Promise<Employee | undefined> {
     return this.employees.get(id);
   }
 
-  async getEmployees(filterText: string): Promise<Employee[]> {
+  async getEmployees(filters: EmployeeFilters): Promise<Employee[]> {
     const employees = Array.from(this.employees.values());
-    if (filterText === "") {
+
+    if (!filters.name && !filters.position && !filters.skills) {
       return employees;
     }
-    const lowerFilter = filterText.toLowerCase();
-    return employees.filter((employee) =>
-      employee.name.toLowerCase().includes(lowerFilter)
-    );
+
+    return employees.filter((employee) => {
+      if (filters.name && employee.name !== filters.name) {
+        return false;
+      }
+
+      if (
+        filters.position &&
+        (!employee.position || employee.position !== filters.position)
+      ) {
+        return false;
+      }
+
+      if (
+        filters.skills &&
+        (!employee.skills || !employee.skills.includes(filters.skills))
+      ) {
+        return false;
+      }
+
+      return true;
+    });
   }
 }

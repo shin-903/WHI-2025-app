@@ -30,6 +30,16 @@ export function EmployeeListItem(prop: EmployeeListItemProps) {
             </Avatar>
             <Box display="flex" flexDirection="column">
               <Typography>{employee.name}</Typography>
+              {employee.position && (
+                <Typography variant="body2" color="text.secondary">
+                  役職: {employee.position}
+                </Typography>
+              )}
+              {employee.skills && (
+                <Typography variant="body2" color="text.secondary">
+                  スキル: {employee.skills}
+                </Typography>
+              )}
             </Box>
           </Box>
         </CardContent>

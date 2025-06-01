@@ -6,7 +6,7 @@ import {
   ScanCommandInput,
 } from "@aws-sdk/client-dynamodb";
 import { isLeft } from "fp-ts/Either";
-import { EmployeeDatabase } from "./EmployeeDatabase";
+import { EmployeeDatabase, EmployeeFilters } from "./EmployeeDatabase";
 import { Employee, EmployeeT } from "./Employee";
 
 export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
@@ -34,6 +34,8 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
       id: id,
       name: item["name"].S,
       age: mapNullable(item["age"].N, (value) => parseInt(value, 10)),
+      ...(item["position"] && { position: item["position"].S }),
+      ...(item["skills"] && { skills: item["skills"].S }),
     };
     const decoded = EmployeeT.decode(employee);
     if (isLeft(decoded)) {
@@ -45,9 +47,7 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
     }
   }
 
-  async getEmployees(filterText: string): Promise<Employee[]> {
-    const lowerFilter = filterText.trim().toLowerCase();
-
+  async getEmployees(filters: EmployeeFilters): Promise<Employee[]> {
     const input: ScanCommandInput = {
       TableName: this.tableName,
     };
@@ -58,20 +58,36 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
     }
     return items
       .filter((item) => {
-        const name = item["name"]?.S;
-        if (!name) return false;
-        if (lowerFilter === "") {
-          return true;
+        if (filters.name && item["name"].S !== filters.name) {
+          return false;
         }
 
-        return name.toLowerCase().includes(lowerFilter);
+        if (
+          filters.position &&
+          (!item["position"] || item["position"].S !== filters.position)
+        ) {
+          return false;
+        }
+
+        if (
+          filters.skills &&
+          (!item["skills"] ||
+            (item["skills"].S && item["skills"].S.includes(filters.skills)))
+        ) {
+          return false;
+        }
+
+        return true;
       })
       .map((item) => {
-        return {
+        const employee = {
           id: item["id"].S,
           name: item["name"].S,
           age: mapNullable(item["age"].N, (value) => parseInt(value, 10)),
+          ...(item["position"] && { position: item["position"].S }),
+          ...(item["skills"] && { skills: item["skills"].S }),
         };
+        return employee;
       })
       .flatMap((employee) => {
         const decoded = EmployeeT.decode(employee);

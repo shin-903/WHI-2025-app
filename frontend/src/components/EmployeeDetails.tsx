@@ -75,6 +75,12 @@ export function EmployeeDetails(prop: EmployeeDetailsProps) {
           <Box p={2} display="flex" flexDirection="column" gap={1}>
             <Typography variant="h6">基本情報</Typography>
             <Typography>年齢：{employee.age}歳</Typography>
+            {employee.position && (
+              <Typography>役職：{employee.position}</Typography>
+            )}
+            {employee.skills && (
+              <Typography>スキル：{employee.skills}</Typography>
+            )}
           </Box>
         </TabContent>
 
