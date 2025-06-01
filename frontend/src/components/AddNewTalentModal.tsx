@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Modal, Box, TextField } from "@mui/material";
 import "./addNewTalentModal.css";
-
 interface AddNewTalentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,12 +13,22 @@ export function AddNewTalentModal({ isOpen, onClose, children }: AddNewTalentMod
 
   const submitForm = async () => {
     const employee = {name, age: parseInt(age, 10)};
+    const body = JSON.stringify(employee);
+
+    const encodedBody = new TextEncoder().encode(body);
+    const digest = await window.crypto.subtle.digest("SHA-256", encodedBody);
+    const hashedBody = Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    console.log(hashedBody);
     await fetch(`/api/employees`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-amz-content-sha256": hashedBody,
       },
-      body: JSON.stringify(employee),
+      body: body,
     });
 
     console.log(`登録: 名前=${name}, 年齢=${age}`);
