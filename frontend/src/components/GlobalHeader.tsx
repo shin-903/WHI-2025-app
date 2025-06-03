@@ -1,7 +1,6 @@
 "use client";
 
 import { AppBar, Box, Toolbar, Typography, Switch } from "@mui/material";
-import PeopleIcon from "@mui/icons-material/People";
 import Link from "next/link";
 
 export interface GlobalHeaderProps {
@@ -27,7 +26,11 @@ export function GlobalHeader({ title, isDarkMode, onDarkModeToggle }: GlobalHead
         >
           <Box sx={{ display: "flex", flexGrow: 1}}>
             <Link href="/">
-              <PeopleIcon fontSize={"large"} sx={{ mr: 2 }} />
+              <img
+                src="/logo-ezmatcher.png"
+                alt="EzMatcher Logo"
+                style={{ width: 32, height: 32, marginRight: 8 }}
+              />
             </Link>
             <Link href="/">
               <Typography variant="h6" component="h1" sx={{ flexGrow: 1 }}>

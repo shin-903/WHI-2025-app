@@ -1,5 +1,5 @@
 import { EmployeeDatabase, EmployeeFilters } from "./EmployeeDatabase";
-import { Employee } from "./Employee";
+import { Employee, NewEmployee } from "./Employee";
 
 export class EmployeeDatabaseInMemory implements EmployeeDatabase {
   private employees: Map<string, Employee>;
@@ -62,4 +62,8 @@ export class EmployeeDatabaseInMemory implements EmployeeDatabase {
       return true;
     });
   }
+
+    async addEmployee(employee: NewEmployee): Promise<void> {
+        console.log("test");
+    }
 }

@@ -3,7 +3,7 @@ import type {
   LambdaFunctionURLResult,
 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { Employee } from "./employee/Employee";
+import { Employee, NewEmployee } from "./employee/Employee";
 import { EmployeeDatabaseDynamoDB } from "./employee/EmployeeDatabaseDynamoDB";
 import { EmployeeDatabase, EmployeeFilters } from "./employee/EmployeeDatabase";
 
@@ -33,46 +33,56 @@ const getEmployeesHandler = async (
   };
 };
 
-export const handle = async (
-  event: LambdaFunctionURLEvent
-): Promise<LambdaFunctionURLResult> => {
-  console.log("event", event);
-  try {
-    const tableName = process.env.EMPLOYEE_TABLE_NAME;
-    if (tableName == null) {
-      throw new Error(
-        "The environment variable EMPLOYEE_TABLE_NAME is not specified."
-      );
+const postEmployeeHandler = async (database: EmployeeDatabase, employee: NewEmployee): Promise<LambdaFunctionURLResult> => {
+    await database.addEmployee(employee);
+    return{
+        statusCode: 201,
     }
-    const client = new DynamoDBClient();
-    const database = new EmployeeDatabaseDynamoDB(client, tableName);
-    // https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/urls-invocation.html
-    const path = normalizePath(event.requestContext.http.path);
-    const query = event.queryStringParameters || {};
+}
 
-    if (path === "/api/employees/") {
-      const filters: EmployeeFilters = {
-        name: query.name || undefined,
-        position: query.position || undefined,
-        skills: query.skills || undefined,
-      };
-      return getEmployeesHandler(database, filters);
-    } else if (path.startsWith("/api/employees/")) {
-      const id = path.substring("/api/employees/".length);
-      return getEmployeeHandler(database, id);
-    } else {
-      console.log("Invalid path", path);
-      return { statusCode: 400 };
+export const handle = async (event: LambdaFunctionURLEvent): Promise<LambdaFunctionURLResult> => {
+    console.log('event', event);
+    try {
+        const tableName = process.env.EMPLOYEE_TABLE_NAME;
+        if (tableName == null) {
+            throw new Error("The environment variable EMPLOYEE_TABLE_NAME is not specified.");
+        }
+        const client = new DynamoDBClient();
+        const database = new EmployeeDatabaseDynamoDB(client, tableName);
+        // https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/urls-invocation.html
+        const path = normalizePath(event.requestContext.http.path);
+
+        if( event.requestContext.http.method == "GET" ) {
+            const query = event.queryStringParameters;
+            if (path === "/api/employees/") {
+                const filters: EmployeeFilters = {
+                    name: query.name || undefined,
+                    position: query.position || undefined,
+                    skills: query.skills || undefined,
+                  };
+                  return getEmployeesHandler(database, filters);
+                } else if (path.startsWith("/api/employees/")) {
+                const id = path.substring("/api/employees/".length);
+                return getEmployeeHandler(database, id);
+            } else {
+                console.log("Invalid path", path);
+                return { statusCode: 400 };
+            }
+        } else if ( event.requestContext.http.method == "POST") {
+            return postEmployeeHandler(database, event.body ? JSON.parse(event.body) : undefined)
+        } else {
+            return { statusCode: 400 };
+        }
+
+    } catch (e) {
+        console.error('Internal Server Error', e);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                message: "Internal Server Error",
+            }),
+        };
     }
-  } catch (e) {
-    console.error("Internal Server Error", e);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: "Internal Server Error",
-      }),
-    };
-  }
 };
 
 function normalizePath(path: string): string {

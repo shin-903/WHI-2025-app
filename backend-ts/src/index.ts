@@ -45,6 +45,11 @@ app.get("/api/employees/:userId", async (req: Request, res: Response) => {
   }
 });
 
+app.post("/api/employees/", async (req: Request, res: Response) => {
+    const employee = JSON.parse(req.body.toString());
+    await database.addEmployee(employee);
+});
+
 app.listen(port, () => {
   console.log(`App listening on the port ${port}`);
 });

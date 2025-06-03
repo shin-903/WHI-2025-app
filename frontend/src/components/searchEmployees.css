@@ -1,0 +1,20 @@
+.button__addTalent{
+  all: unset;
+
+  cursor: pointer;
+  width: 20%;
+  background-color: #025ead;
+  border-radius: 7px;
+  margin-left: auto;
+  padding: 12px 10px;
+
+  color: #FFFFFF;
+  text-align: center;
+  font-weight: 900;
+
+  box-shadow: 5px 5px 10px -5px #777777;
+}
+
+.button__addTalent:hover{
+  background-color: #0a6fbf;
+}
