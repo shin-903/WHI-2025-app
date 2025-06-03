@@ -1,27 +1,36 @@
-import type { LambdaFunctionURLEvent, LambdaFunctionURLResult } from 'aws-lambda';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { Employee, NewEmployee } from './employee/Employee';
-import { EmployeeDatabaseDynamoDB } from './employee/EmployeeDatabaseDynamoDB';
-import { EmployeeDatabase } from './employee/EmployeeDatabase';
+import type {
+  LambdaFunctionURLEvent,
+  LambdaFunctionURLResult,
+} from "aws-lambda";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { Employee, NewEmployee } from "./employee/Employee";
+import { EmployeeDatabaseDynamoDB } from "./employee/EmployeeDatabaseDynamoDB";
+import { EmployeeDatabase, EmployeeFilters } from "./employee/EmployeeDatabase";
 
-const getEmployeeHandler = async (database: EmployeeDatabase, id: string): Promise<LambdaFunctionURLResult> => {
-    const employee: Employee | undefined = await database.getEmployee(id);
-    if (employee == null) {
-        console.log("A user is not found.");
-        return { statusCode: 404 };
-    }
-    return {
-        statusCode: 200,
-        body: JSON.stringify(employee),
-    };
+const getEmployeeHandler = async (
+  database: EmployeeDatabase,
+  id: string
+): Promise<LambdaFunctionURLResult> => {
+  const employee: Employee | undefined = await database.getEmployee(id);
+  if (employee == null) {
+    console.log("A user is not found.");
+    return { statusCode: 404 };
+  }
+  return {
+    statusCode: 200,
+    body: JSON.stringify(employee),
+  };
 };
 
-const getEmployeesHandler = async (database: EmployeeDatabase, filterText: string): Promise<LambdaFunctionURLResult> => {
-    const employees: Employee[] = await database.getEmployees(filterText);
-    return {
-        statusCode: 200,
-        body: JSON.stringify(employees),
-    };
+const getEmployeesHandler = async (
+  database: EmployeeDatabase,
+  filters: EmployeeFilters
+): Promise<LambdaFunctionURLResult> => {
+  const employees: Employee[] = await database.getEmployees(filters);
+  return {
+    statusCode: 200,
+    body: JSON.stringify(employees),
+  };
 };
 
 const postEmployeeHandler = async (database: EmployeeDatabase, employee: NewEmployee): Promise<LambdaFunctionURLResult> => {
@@ -46,8 +55,13 @@ export const handle = async (event: LambdaFunctionURLEvent): Promise<LambdaFunct
         if( event.requestContext.http.method == "GET" ) {
             const query = event.queryStringParameters;
             if (path === "/api/employees/") {
-                return getEmployeesHandler(database, query?.filterText ?? "");
-            } else if (path.startsWith("/api/employees/")) {
+                const filters: EmployeeFilters = {
+                    name: query.name || undefined,
+                    position: query.position || undefined,
+                    skills: query.skills || undefined,
+                  };
+                  return getEmployeesHandler(database, filters);
+                } else if (path.startsWith("/api/employees/")) {
                 const id = path.substring("/api/employees/".length);
                 return getEmployeeHandler(database, id);
             } else {
@@ -72,5 +86,5 @@ export const handle = async (event: LambdaFunctionURLEvent): Promise<LambdaFunct
 };
 
 function normalizePath(path: string): string {
-    return path.endsWith("/") ? path : path + "/";
+  return path.endsWith("/") ? path : path + "/";
 }

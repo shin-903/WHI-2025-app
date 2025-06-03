@@ -1,0 +1,37 @@
+name: PreMerge Test
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  pre-merge-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Build frontend
+        run: cd frontend && npm run build
+
+      - name: Run unit tests
+        run: cd frontend && npm test
+
+      - name: Install backend dependencies
+        run: cd backend-ts && npm ci
+
+      - name: Build backend
+        run: cd backend-ts && npm run build
+
+      - name: Run backend unit tests
+        run: cd backend-ts && npm test

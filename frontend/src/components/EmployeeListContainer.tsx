@@ -7,7 +7,11 @@ import { EmployeeListItem } from "./EmployeeListItem";
 import { Employee, EmployeeT } from "../models/Employee";
 
 export type EmployeesContainerProps = {
-  filterText: string;
+  filters: {
+    name?: string;
+    position?: string;
+    skills?: string;
+  };
 };
 
 const EmployeesT = t.array(EmployeeT);
@@ -25,17 +29,26 @@ const employeesFetcher = async (url: string): Promise<Employee[]> => {
   return decoded.right;
 };
 
-export function EmployeeListContainer({ filterText }: EmployeesContainerProps) {
-  const encodedFilterText = encodeURIComponent(filterText);
+export function EmployeeListContainer({ filters }: EmployeesContainerProps) {
+  const queryParams = new URLSearchParams();
+  if (filters.name) queryParams.append("name", filters.name);
+  if (filters.position) queryParams.append("position", filters.position);
+  if (filters.skills) queryParams.append("skills", filters.skills);
+
+  const queryString = queryParams.toString();
+  const url = `/api/employees${queryString ? `?${queryString}` : ""}`;
+
   const { data, error, isLoading } = useSWR<Employee[], Error>(
-    `/api/employees?filterText=${encodedFilterText}`,
+    url,
     employeesFetcher
   );
+
   useEffect(() => {
     if (error != null) {
-      console.error(`Failed to fetch employees filtered by filterText`, error);
+      console.error(`Failed to fetch employees with filters`, error);
     }
-  }, [error, filterText]);
+  }, [error, filters]);
+
   if (data != null) {
     return data.map((employee) => (
       <EmployeeListItem employee={employee} key={employee.id} />
